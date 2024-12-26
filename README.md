@@ -1,78 +1,49 @@
-# Yolo Chat
+‼️ Note: Zero native not working yet
 
-A real-time chat application built with Tauri, React, and PostgreSQL, featuring live synchronization between web and native interfaces.
+There's a recent bug with top-level await happening that we are looking into fixing.
 
-## Features
+# Install
 
-- Real-time message synchronization
-- GitHub authentication
-- Native desktop app (Tauri) and web interface
-- PostgreSQL backend with logical replication
-- Modern UI with Tamagui
+Install packages with yarn:
 
-## Prerequisites
-
-- Node.js
-- Yarn
-- Docker
-- Rust (for Tauri)
-
-## Installation
-
-1. Clone the repository:
-```sh
-git clone https://github.com/Frentz/yolo.git
-cd yolo
-```
-
-2. Install dependencies:
 ```sh
 yarn
 ```
 
-3. Set up GitHub OAuth:
-   - [Create a new Github App](https://docs.github.com/en/apps/creating-github-apps/registering-a-github-app/registering-a-github-app#registering-a-github-app)
-   - Copy `.env.example` to `.env`
-   - Fill in `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET`
+For login, we have set up Github auth with [Better Auth](https://www.better-auth.com/) as an example.
 
-## Development
+1. [Create a new Github App](https://docs.github.com/en/apps/creating-github-apps/registering-a-github-app/registering-a-github-app#registering-a-github-app)
+2. Copy `.env.example` to `.env`
+3. Fill in `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET`
 
-Run these commands in separate terminals:
+# Run
 
-1. Start PostgreSQL and seeder:
-```sh
+in three separate tabs:
+
+```
 yarn docker up
-```
-
-2. Start Zero server:
-```sh
 yarn zero
-```
-
-3. Start Tauri development:
-```sh
-yarn dev:tauri
-```
-
-Or for web-only development:
-```sh
 yarn dev
 ```
 
-### Note for Mac Users
+to run tauri you can run this instead of `yarn dev`:
 
-On Mac, deep links don't work in dev mode. For testing authentication:
-1. Build the production app: `yarn build:web && yarn tauri build`
-2. Move the built app to Applications
-3. Run from there while keeping development servers running
+```
+yarn dev:tauri
+```
 
-## Reset Data
+to reset all your data:
 
-To reset all data:
-```sh
+```
 yarn docker:start:clean
 ```
 
-## License
+## Tauri
 
-MIT
+Getting Tauri to handle auth in a sane way takes a bit of work, but we've set up most of it here for you. If you're using OAuth, you don't want to force your users to login via the Tauri window, as they will lack all saved credentials and be forced to memorize their password / not use passkeys, etc.
+
+So instead we open the login link using target="_blank" so it opens in their default browser, making for a smooth login experience. But that means you need to pass back the credentials to Tauri once logged in.
+
+To do this, we added the deep-link plugin to Tuari, allowing for `one-zero://domain` style URLs to open with your native Tuari app. This allows for really nice hand-off.
+
+On Mac though, you can't use deep links in dev mode. So you'll need to make a production build, drag it to your Applications folder, and run your app from there. We set up the production build to hit your same development server for now, so you can actually just use that built app as your main dev driver. It includes dev tools as you'd normally want, too. Once you set this up development is easy, and login has great UX.
